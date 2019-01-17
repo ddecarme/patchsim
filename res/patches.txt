@@ -1,0 +1,6 @@
+{ "patches" : [
+{"cost_buttons":1, "cost_time":1, "dividend":1, "height":1, "width":2, "map": [1,1]},
+{"cost_buttons":0, "cost_time":1, "dividend":0, "height":2, "width":2, "map": [1,0,1,1]},
+{"cost_buttons":2, "cost_time":0, "dividend":0, "height":1, "width":3, "map": [1,1,1]},
+{"cost_buttons":3, "cost_time":0, "dividend":0, "height":3, "width":3, "map": [1,0,0,1,1,1,0,0,1]}
+]}

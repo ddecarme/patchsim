@@ -1,0 +1,7 @@
+﻿  GameModel.cpp
+  PatchList.cpp
+d:\users\doug\workspace\patchsim\patchsim\patchlib\patchlist.cpp(83): warning C4018: '>=': signed/unsigned mismatch
+d:\users\doug\workspace\patchsim\patchsim\patchlib\patchlist.cpp(94): warning C4018: '<': signed/unsigned mismatch
+d:\users\doug\workspace\patchsim\patchsim\patchlib\patchlist.cpp(101): warning C4018: '<': signed/unsigned mismatch
+  Generating Code...
+  PatchLib.vcxproj -> D:\Users\Doug\workspace\PatchSim\patchsim\Debug\PatchLib.lib

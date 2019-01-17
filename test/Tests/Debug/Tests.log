@@ -1,0 +1,3 @@
+﻿  test.cpp
+PatchLib.lib(Patch.obj) : warning LNK4075: ignoring '/EDITANDCONTINUE' due to '/SAFESEH' specification
+  Tests.vcxproj -> D:\Users\Doug\workspace\PatchSim\patchsim\Debug\Tests.exe
