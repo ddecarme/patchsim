@@ -1,6 +1,8 @@
 #include "PatchList.h"
 #include <fstream>
 #include <iostream>
+#include <random>
+#include <algorithm>
 
 using namespace nlohmann;
 using namespace std;
@@ -38,9 +40,26 @@ void PatchList::LoadPatches(std::string path)
 	}
 
 	// Shuffle the patches in the list. Leave the first patch (2x1 starter) in place
-	random_shuffle(m_patches.begin() + 1, m_patches.end());
+	shuffleList();
 
 	m_head_iter = m_patches.begin();
+}
+
+void PatchList::shuffleList()
+{
+	// Create an RNG for shuffle
+	random_device rng;
+	mt19937 urng(rng());
+
+	// Save the first patch so we can start with it
+	shared_ptr<Patch> first_patch = *m_patches.begin();
+	m_patches.pop_front();
+
+	// Need a temporary vector since we can't shuffle a list. 
+	vector<shared_ptr<Patch>> v(m_patches.begin(), m_patches.end());
+	std::shuffle(v.begin(), v.end(), urng);
+	m_patches.assign(v.begin(), v.end());
+	m_patches.push_front(first_patch);
 }
 
 void PatchList::AddPatch(json& j)
@@ -52,54 +71,71 @@ void PatchList::AddPatch(json& j)
 	int cost_t = j["cost_time"].get<int>();
 	int div = j["dividend"].get<int>();
 
-	// Read the 1-D JSON bit array into the 2-D vector
-	vector<vector<bool>> bmap;
-	int w = 0, h = 0;
-	for (auto iter = j["map"].begin(); iter != j["map"].end(); iter++)
-	{
-		vector<bool> row;
-		row.push_back((*iter > 0) ? true : false);
-		w++;
-		if (w == width)
-		{
-			bmap.push_back(row);
-			w = 0;
-			h++;
-		}
-	}
+	// Read in the bitmap and convert to boolean for creating the grid
+	vector<bool> bmap(height*width);
+	transform(j["map"].begin(), j["map"].end(), bmap.begin(), [](int i) {return i > 0 ? true : false; });
+
+	Grid g(height, width, bmap);
 
 	// Construct the patch, and add to queue
-	auto patch_p = std::make_shared<Patch>(bmap, cost_b, cost_t, div);
+	auto patch_p = std::make_shared<Patch>(g, cost_b, cost_t, div);
 	m_patches.push_back(patch_p);
 }
 
-size_t PatchList::numRemaining(void)
+size_t PatchList::numRemaining(void) const
 {
 	return m_patches.size();
 }
 
-shared_ptr<Patch> PatchList::getPatch(int offset)
+// Returns a pointer to the patch object at the given offset.
+// Does not change the head pointer
+// Returns null if the offset is greater than the number of 
+// patches remaining.
+shared_ptr<Patch> PatchList::getPatch(size_t offset) const
 {
-	if (offset >= numRemaining())
-	{
+	// Return null if there aren't that many patches
+	if (offset >= numRemaining()) {
 		return nullptr;
 	}
 
-	shared_ptr<Patch> patch_p = *(m_head_iter + offset);
-	return patch_p;
+	// Local iterator so we don't change the head. Wrap if needed
+	list<std::shared_ptr<Patch>>::const_iterator local_iter = m_head_iter;
+	while (offset--) {
+		if (++local_iter == m_patches.end()) {
+			local_iter = m_patches.begin();
+		}
+	}
+
+	return *local_iter;	
 }
 
-void PatchList::removePatch(int offset)
+// Remove the patch specified at the offset and advance the head pointer
+// to the element after it
+void PatchList::removePatch(size_t offset)
 {
+	// No valid reason to have the offset wrap around multiple times when removing
 	assert(offset < numRemaining());
-	m_patches.erase(m_head_iter + offset);
-	m_head_iter += offset;
+
+	// Move up the head pointer to point at the patch to erase
+	advance(offset);
+
+	m_head_iter = m_patches.erase(m_head_iter);
+
+	// Wrap to the beginning of the list if we removed the last patch
+	if (m_head_iter == m_patches.end()) {
+		m_head_iter = m_patches.begin();
+	}		
 }
 
 void PatchList::advance(int offset)
 {
-	assert(offset < numRemaining());
-	m_head_iter += offset;
+	// Advance the head pointer by the number of elements specified in offset. Wrap around
+	// to the front of the list if needed
+	while (offset--) {
+		if (++m_head_iter == m_patches.end()) {
+			m_head_iter = m_patches.begin();
+		}
+	}	
 }
 
 void PatchList::reset(void)

@@ -1,17 +1,16 @@
 #include "Patch.h"
+#include "Grid.h"
 #include <ostream>
 #include <iostream>
 
 using namespace std;
 
-Patch::Patch(PatchBitmap &bitmap, int cost_buttons, int cost_time, int revenue) :
-	m_bitmap(bitmap),
+Patch::Patch(const Grid &grid, int cost_buttons, int cost_time, int revenue) :
+	m_grid(grid),
 	m_cost_buttons(cost_buttons),
 	m_cost_time(cost_time),
-	m_revenue(revenue)
+	m_dividend(revenue)
 {
-	m_bitmap = bitmap;
-	m_size = { m_bitmap.size(), m_bitmap[0].size() };	
 }
 
 
@@ -19,6 +18,7 @@ Patch::~Patch()
 {	
 }
 
+#if 0
 std::unique_ptr<PatchBitmap> Patch::GetBitmap(int rot)
 {
 	auto bitm_p = make_unique<PatchBitmap>();
@@ -73,36 +73,25 @@ std::unique_ptr<PatchBitmap> Patch::GetBitmap(int rot)
 
 	return bitm_p;	
 }
+#endif
 
-bool Patch::IsBitmapEqual(PatchBitmap const& bmap)
+int Patch::getCostButtons()
 {
-	if (m_bitmap.size() != bmap.size() || m_bitmap[0].size() != bmap[0].size())
-		return false;
+	return m_cost_buttons;
+}
 
-	for (size_t i = 0; i < m_bitmap.size(); i++)
-	{
-		for (size_t j = 0; j < m_bitmap[0].size(); j++)
-		{
-			if (bmap[i][j] != m_bitmap[i][j])
-			{
-				return false;
-			}
-		}
-	}
+int Patch::getCostTime()
+{
+	return m_cost_time;
+}
 
-	return true;
+int Patch::getDividend()
+{
+	return m_dividend;
 }
 
 std::ostream& operator<<(std::ostream& os, Patch const& p)
 {
-	for (auto vect_patch : p.m_bitmap)
-	{
-		for (bool bit : vect_patch)
-		{
-			os << bit ? "-" : "X";
-		}
-		os << std::endl;
-	}
-	os << std::endl;
+	os << p.m_grid << std::endl;
 	return os;
 }

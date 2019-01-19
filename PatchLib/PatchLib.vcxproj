@@ -116,12 +116,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameModel.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Patch.cpp" />
     <ClCompile Include="PatchList.cpp" />
     <ClCompile Include="PlayerBoard.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameModel.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Patch.h" />
     <ClInclude Include="PatchList.h" />

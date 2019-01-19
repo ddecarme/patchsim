@@ -3,27 +3,26 @@
 #include <utility>
 #include <vector>
 #include <memory>
+#include "Grid.h"
 
 
-typedef std::vector<std::vector<bool>> PatchBitmap;
-
-class Patch
+struct Patch
 {
 public:
-	Patch(PatchBitmap &bitmap, int cost_buttons, int cost_time, int revenue);
+	explicit Patch(const Grid &grid, int cost_buttons, int cost_time, int revenue);
 	~Patch();
 
 	friend std::ostream& operator<<(std::ostream& os, Patch const& p);
-	std::unique_ptr<PatchBitmap> GetBitmap(int rot);
-	bool IsBitmapEqual(PatchBitmap const& bmap);
-
-	std::pair<int,int> m_size;	
-
+	const Grid& getGrid() const { return m_grid; };
+	int getCostButtons();
+	int getCostTime();
+	int getDividend();
+	
 private:
-	PatchBitmap m_bitmap;
+	Grid m_grid;
 	int m_cost_buttons;
 	int m_cost_time;
-	int m_revenue;
+	int m_dividend;
 	
 };
 
