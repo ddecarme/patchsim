@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "Patch.h"
 #include "GameModel.h"
+#include "GameTracker.h"
 
 using namespace std;
 
@@ -39,16 +40,27 @@ TEST(Grid, Merge) {
 	std::vector<bool> bmap_big = { 1,1,0,1,1,0,0,0,0 };
 	Grid g_big(3, 3, bmap_big);
 
-	std::vector<bool> bmap_small = { 1,1,1,0 };
+	std::vector<bool> bmap_small = { 0,1,1,1 };
 	Grid g_small(2, 2, bmap_small);
 
 	g_big.merge(g_small, 1, 1);
 
-	std::vector<bool> bmap_expected = { 1,1,0,1,1,1,0,1,0 };
+	std::vector<bool> bmap_expected = { 1,1,0,1,1,1,0,1,1 };
 	Grid g_expected(3, 3, bmap_expected);
 
 	EXPECT_TRUE(g_big == g_expected);
 };
+
+TEST(Grid, Intersect) {
+	std::vector<bool> bmap_big = { 1,1,0,1,1,0,0,0,0 };
+	Grid g_big(3, 3, bmap_big);
+
+	std::vector<bool> bmap_small = { 0,1,1,1 };
+	Grid g_small(2, 2, bmap_small);
+
+	EXPECT_FALSE(g_big.checkIntersect(g_small, 1, 1));
+	EXPECT_TRUE(g_big.checkIntersect(g_small, 1, 0));
+}
 
 TEST(Grid, Rotate) {
 	ASSERT_TRUE(false);
@@ -150,4 +162,54 @@ TEST(PatchList, Wraparound) {
 	EXPECT_TRUE(patch_before->getGrid() == patch_after->getGrid());
 }
 
+TEST(GameTracker, TurnOrder) {
+	GameTracker gt(2, 0);
+	EXPECT_EQ(gt.getNextPlayer(), 0);
+	EXPECT_EQ(gt.getPlayerPosition(0), 0);
+	EXPECT_EQ(gt.getPlayerPosition(1), 0);
+	
+	gt.advancePlayer(0, 1);
+	EXPECT_EQ(gt.getNextPlayer(), 1);
+	
+	// Advance p1 to be even, still p1's turn
+	gt.advancePlayer(1, 1);
+	EXPECT_EQ(gt.getNextPlayer(), 1);
 
+	gt.advancePlayer(1, 1);
+	EXPECT_EQ(gt.getNextPlayer(), 0);
+
+	gt.advancePlayer(0, 10);
+	EXPECT_EQ(gt.getNextPlayer(), 1);
+	EXPECT_EQ(gt.getPlayerPosition(0), 11);
+	EXPECT_EQ(gt.getPlayerPosition(1), 2);
+}
+
+TEST(GameTracker, GameOver) {
+	GameTracker gt(2, 0);
+	EXPECT_FALSE(gt.isGameOver());
+
+	gt.advancePlayer(0, 52);
+	EXPECT_FALSE(gt.isGameOver());
+	gt.advancePlayer(1, 52);
+	EXPECT_FALSE(gt.isGameOver());
+	gt.advancePlayer(1, 2);
+	EXPECT_FALSE(gt.isGameOver());
+	gt.advancePlayer(0, 1);
+	EXPECT_TRUE(gt.isGameOver());
+}
+
+TEST(GameTracker, Milestones) {
+	GameTracker gt(2, 0);
+	EXPECT_FALSE(gt.buttonInRange(0, 4));
+	EXPECT_FALSE(gt.spareInRange(0, 19));
+	EXPECT_TRUE(gt.buttonInRange(0, 5));
+	EXPECT_TRUE(gt.spareInRange(0, 20));
+
+	gt.advancePlayer(0, 6);
+	EXPECT_FALSE(gt.buttonInRange(0, 4));
+	EXPECT_TRUE(gt.buttonInRange(0, 5));
+
+	gt.advancePlayer(1, 3);
+	EXPECT_FALSE(gt.buttonInRange(1, 1));
+	EXPECT_FALSE(gt.buttonInRange(1, 2));
+}

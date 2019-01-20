@@ -21,6 +21,9 @@ public:
 	// performing a union
 	void merge(const Grid& grid, size_t row_offset, size_t col_offset);
 
+	// Check if any true elements of the input grid would intersect with the member grid
+	bool checkIntersect(const Grid& grid, size_t row_offset, size_t col_offset) const;
+
 	// Set all elements of the grid to false
 	void clear();
 

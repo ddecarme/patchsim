@@ -116,6 +116,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="GameModel.cpp" />
+    <ClCompile Include="GameTracker.cpp" />
     <ClCompile Include="Grid.cpp" />
     <ClCompile Include="Patch.cpp" />
     <ClCompile Include="PatchList.cpp" />
@@ -123,6 +124,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="GameModel.h" />
+    <ClInclude Include="GameTracker.h" />
     <ClInclude Include="Grid.h" />
     <ClInclude Include="json.hpp" />
     <ClInclude Include="Patch.h" />

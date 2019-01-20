@@ -53,12 +53,37 @@ void Grid::merge(const Grid & grid, size_t row_offset, size_t col_offset)
 	for (size_t r = 0; r < grid.m_rows; r++) {
 		for (size_t c = 0; c < grid.m_cols; c++) {
 			if (grid.at(r, c) == true) {
+				// No true elements should be outside the bounds of the member grid
 				assert(r + row_offset < m_rows);
 				assert(c + col_offset < m_cols);
+
+				// This element of the member grid should not already be set to true
+				assert(at(r + row_offset, c + col_offset) == false);
+
 				set(r + row_offset, c + col_offset, true);
 			}
 		}
 	}
+}
+
+bool Grid::checkIntersect(const Grid & grid, size_t row_offset, size_t col_offset) const
+{
+	for (size_t r = 0; r < grid.m_rows; r++) {
+		for (size_t c = 0; c < grid.m_cols; c++) {
+			if (grid.at(r, c) == true) {
+				// No true elements should be outside the bounds of the member grid
+				assert(r + row_offset < m_rows);
+				assert(c + col_offset < m_cols);
+				
+				if (at(r + row_offset, c + col_offset) == true) {
+					// Found an intersection
+					return true;
+				}
+			}
+		}
+	}
+
+	return false;
 }
 
 void Grid::clear()
