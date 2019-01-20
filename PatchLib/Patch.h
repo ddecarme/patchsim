@@ -29,7 +29,7 @@ private:
 struct PatchPlacement
 {
 	std::shared_ptr<Patch> patch_p;
-	int pos_x;
-	int pos_y;
+	int row_offset;
+	int col_offset;
 	int rot;	
 };

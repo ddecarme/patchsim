@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Patch.h"
 #include "GameModel.h"
-#include "GameTracker.h"
+#include "GameTrack.h"
 
 using namespace std;
 
@@ -107,15 +107,16 @@ TEST(PatchList, Remaining) {
 
 TEST(PatchList, Get) {
 	unique_ptr<PatchList> pl = LoadPatchList();
+
+	// The first patch doesn't get shuffled, so we can be sure of its properties
 	shared_ptr<Patch> patch = pl->getPatch(0);
 	EXPECT_EQ(patch->getCostButtons(), 1);
 	EXPECT_EQ(patch->getCostTime(), 1);
 	EXPECT_EQ(patch->getDividend(), 1);
 
+	// Other patches are shuffled, so can't confirm much
 	patch = pl->getPatch(1);
-	EXPECT_EQ(patch->getCostButtons(), 0);
-	EXPECT_EQ(patch->getCostTime(), 1);
-	EXPECT_EQ(patch->getDividend(), 0);
+	EXPECT_TRUE(patch != nullptr);
 
 	patch = pl->getPatch(20);
 	EXPECT_TRUE(patch == nullptr);
@@ -162,8 +163,8 @@ TEST(PatchList, Wraparound) {
 	EXPECT_TRUE(patch_before->getGrid() == patch_after->getGrid());
 }
 
-TEST(GameTracker, TurnOrder) {
-	GameTracker gt(2, 0);
+TEST(GameTrack, TurnOrder) {
+	GameTrack gt(2, 0);
 	EXPECT_EQ(gt.getNextPlayer(), 0);
 	EXPECT_EQ(gt.getPlayerPosition(0), 0);
 	EXPECT_EQ(gt.getPlayerPosition(1), 0);
@@ -184,8 +185,8 @@ TEST(GameTracker, TurnOrder) {
 	EXPECT_EQ(gt.getPlayerPosition(1), 2);
 }
 
-TEST(GameTracker, GameOver) {
-	GameTracker gt(2, 0);
+TEST(GameTrack, GameOver) {
+	GameTrack gt(2, 0);
 	EXPECT_FALSE(gt.isGameOver());
 
 	gt.advancePlayer(0, 52);
@@ -198,8 +199,8 @@ TEST(GameTracker, GameOver) {
 	EXPECT_TRUE(gt.isGameOver());
 }
 
-TEST(GameTracker, Milestones) {
-	GameTracker gt(2, 0);
+TEST(GameTrack, Milestones) {
+	GameTrack gt(2, 0);
 	EXPECT_FALSE(gt.buttonInRange(0, 4));
 	EXPECT_FALSE(gt.spareInRange(0, 19));
 	EXPECT_TRUE(gt.buttonInRange(0, 5));

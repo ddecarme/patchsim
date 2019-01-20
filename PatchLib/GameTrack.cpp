@@ -1,4 +1,4 @@
-#include "GameTracker.h"
+#include "GameTrack.h"
 #include <cassert>
 
 // Constants from the game board
@@ -6,28 +6,28 @@ static const std::vector<int> BUTTON_LOCS = { 4,10,16,22,28,34,40,46,52 };
 static const std::vector<int> SPARE_LOCS = { 19,25,31,43,49 };
 static const int NUM_SPACES = 53;
 
-GameTracker::GameTracker(int num_players, int first_player) :
+GameTrack::GameTrack(int num_players, int first_player) :
 	m_player_loc(num_players, 0),
 	m_cur_player(first_player)
 {
 }
 
 
-GameTracker::~GameTracker()
+GameTrack::~GameTrack()
 {
 }
 
-int GameTracker::getPlayerPosition(int player_idx) const
+int GameTrack::getPlayerPosition(int player_idx) const
 {
 	return m_player_loc[player_idx];
 }
 
-int GameTracker::getNextPlayer() const
+int GameTrack::getNextPlayer() const
 {
 	return m_cur_player;
 }
 
-void GameTracker::advancePlayer(int adv_player, int steps)
+void GameTrack::advancePlayer(int adv_player, int steps)
 {
 	// We should only ever advance who the tracker thinks is the current player,
 	// otherwise there's a logic bug somewhere
@@ -54,7 +54,7 @@ void GameTracker::advancePlayer(int adv_player, int steps)
 
 }
 
-bool GameTracker::isGameOver() const
+bool GameTrack::isGameOver() const
 {	
 	for (int location : m_player_loc) {
 		if (location < NUM_SPACES) {
@@ -66,7 +66,7 @@ bool GameTracker::isGameOver() const
 	return true;
 }
 
-bool GameTracker::checkRange(int start_loc, int end_loc,
+bool GameTrack::checkRange(int start_loc, int end_loc,
 	std::vector<int>::const_iterator iter_begin, std::vector<int>::const_iterator iter_end)
 {
 	// Not possible to get multiple patches/spares in one move, so this just returns a bool
@@ -81,12 +81,12 @@ bool GameTracker::checkRange(int start_loc, int end_loc,
 	return false;
 }
 
-bool GameTracker::buttonInRange(int player_idx, int steps) const
+bool GameTrack::buttonInRange(int player_idx, int steps) const
 {
 	return checkRange(player_idx, player_idx + steps, BUTTON_LOCS.cbegin(), BUTTON_LOCS.cend());
 }
 
-bool GameTracker::spareInRange(int player_idx, int steps) const
+bool GameTrack::spareInRange(int player_idx, int steps) const
 {
 	return checkRange(player_idx, player_idx + steps, SPARE_LOCS.cbegin(), SPARE_LOCS.cend());
 }

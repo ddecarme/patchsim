@@ -1,11 +1,11 @@
 #pragma once
 #include <vector>
 
-class GameTracker
+class GameTrack
 {
 public:
-	GameTracker(int num_players, int first_player);
-	~GameTracker();
+	GameTrack(int num_players, int first_player);
+	~GameTrack();
 
 	int getPlayerPosition(int player_idx) const;
 	int getNextPlayer() const;

@@ -17,7 +17,8 @@ public:
 	size_t numRemaining(void) const;
 
 private:
-	// TODO: This should be a list, and needs to be circular
+	// TODO: This could directly store patches and retern a reference, 
+	// rather than dealing with shared ptrs
 	std::list<std::shared_ptr<Patch>> m_patches;
 	std::list<std::shared_ptr<Patch>>::iterator m_head_iter;
 	std::string m_res_path;

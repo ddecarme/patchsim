@@ -42,6 +42,7 @@ void PatchList::LoadPatches(std::string path)
 	// Shuffle the patches in the list. Leave the first patch (2x1 starter) in place
 	shuffleList();
 
+	// Initialize the head pointer
 	m_head_iter = m_patches.begin();
 }
 
