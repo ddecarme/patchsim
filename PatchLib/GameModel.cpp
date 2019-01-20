@@ -5,7 +5,8 @@
 
 GameModel::GameModel(int num_players) :
 	m_num_players(num_players),
-	m_state("..\\res\\patches.txt", num_players, 0)	
+	m_players(num_players),
+	m_state("res\\patches.txt", num_players, 0)	
 {
 
 }
@@ -34,11 +35,22 @@ void GameModel::startGame()
 	log("Starting game now");
 
 	while (!m_state.m_track.isGameOver()) {
+		// Print player states
+		for (int p = 0; p < m_num_players; p++) {
+			cout << "Player " << p + 1 << " board:" << endl;
+			cout << m_state.m_player_states[p] << endl;
+		}
+
+		// Print available patches
+		cout << m_state.m_patchlist;
+
+		// Print tracker state to console
+		cout << m_state.m_track;
+
 		// Determine which players' turn it is
 		int cur_player = m_state.m_track.getNextPlayer();
 
 		// Tell the player to take its turn and give us a resulting action
-		cout << "Player " << cur_player << "'s turn" << endl;
 		Action player_action;
 		m_players[cur_player]->TakeTurn(m_state, player_action);
 
@@ -46,7 +58,7 @@ void GameModel::startGame()
 		switch (player_action.m_choice) {
 		case Action::PASS:
 			cout << "Player PASSED" << endl;
-
+			assert(0);
 			break;
 
 		case Action::TAKE_PATCH:
@@ -54,6 +66,8 @@ void GameModel::startGame()
 			break;
 		}
 	}
+
+	// TODO Calculate scores and declare winner
 }
 
 

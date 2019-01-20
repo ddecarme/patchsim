@@ -1,7 +1,7 @@
 #include <iostream>
-#include "Patch.h"
 #include "GameModel.h"
 #include <ctime>
+#include "HumanCLIPlayer.h"
 
 using namespace std;
 
@@ -10,16 +10,15 @@ int main()
 	cout << "Running patchsim\n";
 
 	// Init RNG used for shuffling
+	// TODO is this still needed after switching to cpp rng
 	srand((unsigned)time(0));
 
-	GameModel mdl(2);
-	shared_ptr<Patch> p_ref;
+	GameModel game(2);
+	unique_ptr<Player> p1 = make_unique<HumanCLIPlayer>();
+	unique_ptr<Player> p2 = make_unique<HumanCLIPlayer>();
+	game.addPlayer(0, std::move(p1));
+	game.addPlayer(1, std::move(p2));
+	game.startGame();
 
-#if 0
-	while (p_ref = mdl.getNextPatch())
-	{
-		cout << *p_ref;
-	}
-#endif
 	return 0;
 }

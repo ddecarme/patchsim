@@ -16,6 +16,8 @@ public:
 	void reset(void);
 	size_t numRemaining(void) const;
 
+	friend std::ostream& operator<<(std::ostream& os, PatchList const& pl);
+
 private:
 	// TODO: This could directly store patches and retern a reference, 
 	// rather than dealing with shared ptrs
@@ -28,3 +30,4 @@ private:
 	void shuffleList();
 };
 
+ 

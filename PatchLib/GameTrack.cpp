@@ -1,5 +1,7 @@
 #include "GameTrack.h"
 #include <cassert>
+#include <string>
+#include <algorithm>
 
 // Constants from the game board
 static const std::vector<int> BUTTON_LOCS = { 4,10,16,22,28,34,40,46,52 };
@@ -34,7 +36,10 @@ void GameTrack::advancePlayer(int adv_player, int steps)
 	assert(adv_player == m_cur_player);
 
 	// Advance the location
-	m_player_loc[adv_player] += steps;
+	int new_loc = m_player_loc[adv_player] + steps;
+
+	// Cap the location at the end of the board
+	m_player_loc[adv_player] = std::min(new_loc, NUM_SPACES);
 
 	// Check if the current player has changed by iterating through
 	// the other players and checking if their position is now lower
@@ -81,6 +86,11 @@ bool GameTrack::checkRange(int start_loc, int end_loc,
 	return false;
 }
 
+bool GameTrack::checkSpace(int space_idx, std::vector<int> const &indexes) const {	
+	auto iter = std::find(indexes.cbegin(), indexes.cend(), space_idx);
+	return iter != indexes.cend();
+}
+
 bool GameTrack::buttonInRange(int player_idx, int steps) const
 {
 	return checkRange(player_idx, player_idx + steps, BUTTON_LOCS.cbegin(), BUTTON_LOCS.cend());
@@ -89,4 +99,46 @@ bool GameTrack::buttonInRange(int player_idx, int steps) const
 bool GameTrack::spareInRange(int player_idx, int steps) const
 {
 	return checkRange(player_idx, player_idx + steps, SPARE_LOCS.cbegin(), SPARE_LOCS.cend());
+}
+
+void GameTrack::formatPlayerLine(int player_idx, std::string &str) const
+{
+	str.insert(str.end(), m_player_loc[player_idx], ' ');
+	str.push_back('0' + player_idx + 1);	
+}
+
+std::ostream& operator<<(std::ostream& os, GameTrack const& gt)
+{
+	// First line is the first player marker
+	std::string line = ">";
+	gt.formatPlayerLine(0, line);
+	os << line << std::endl;
+
+	// Second line is the game path, with @ for buttons and X for spare patches
+	line.clear();
+	line.push_back('>');
+	for (int i = 0; i < NUM_SPACES; i++) {
+		if (gt.checkSpace(i, BUTTON_LOCS)) {
+			line.push_back('@');
+		}
+		else if (gt.checkSpace(i, SPARE_LOCS)) {
+			line.push_back('X');
+		}
+		else {
+			line.push_back('-');
+		}
+	}
+	line.push_back('|');
+	os << line << std::endl;
+
+	// Third line is the second player marker (and any further players)
+	line.clear();
+	line.push_back('>');
+	gt.formatPlayerLine(1, line);
+	os << line << std::endl;
+
+	// Print whose turn it is
+	os << "Player " << gt.getNextPlayer() + 1 << "'s turn" << std::endl;
+
+	return os;
 }

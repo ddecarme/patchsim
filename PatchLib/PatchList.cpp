@@ -144,3 +144,16 @@ void PatchList::reset(void)
 	m_patches.clear();
 	LoadPatches(m_res_path);
 }
+
+std::ostream& operator<<(std::ostream& os, PatchList const& pl) {
+	os << "Next available patches:" << endl;
+
+	for (int i = 0; i < 6; i++) {
+		Patch *p = pl.getPatch(i).get();
+		if (p) {
+			os << *p << endl;
+		}
+	}
+
+	return os;
+}

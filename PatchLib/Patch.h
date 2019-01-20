@@ -14,9 +14,9 @@ public:
 
 	friend std::ostream& operator<<(std::ostream& os, Patch const& p);
 	const Grid& getGrid() const { return m_grid; };
-	int getCostButtons();
-	int getCostTime();
-	int getDividend();
+	int getCostButtons() const;
+	int getCostTime() const;
+	int getDividend() const;
 	
 private:
 	Grid m_grid;

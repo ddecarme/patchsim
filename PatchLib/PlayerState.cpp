@@ -26,3 +26,12 @@ void PlayerState::AddPlacement(struct PatchPlacement& p)
 	m_grid.merge(p.patch_p->getGrid(), p.row_offset, p.col_offset);
 	m_buttons -= p.patch_p->getCostButtons();
 }
+
+std::ostream& operator<<(std::ostream& os, PlayerState const& ps) {
+	os << ps.m_grid << "Player has " << ps.m_buttons << " buttons in hand";
+	if (ps.m_has_bonus) {
+		os << ", and has the 7x7 bonus";
+	}
+	os << std::endl;
+	return os;
+}

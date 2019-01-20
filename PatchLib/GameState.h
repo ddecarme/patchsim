@@ -10,10 +10,10 @@ struct GameState
 	GameState(std::string patch_res_path, int num_players, int first_player) :
 		m_patchlist(patch_res_path),
 		m_track(num_players, first_player),
-		m_players(num_players) {}
+		m_player_states(num_players) {}
 	PatchList m_patchlist;
 	GameTrack m_track;
-	std::vector<PlayerState> m_players;
+	std::vector<PlayerState> m_player_states;
 };
 
 struct Action

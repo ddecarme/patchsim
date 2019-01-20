@@ -123,7 +123,7 @@ std::ostream & operator<<(std::ostream & os, Grid const & g)
 	// TODO : Could be implemented cleaner with an iterator
 	for (size_t r = 0; r < g.m_rows; r++) {
 		for (size_t c = 0; c < g.m_cols; c++) {
-			os << g.at(r, c) ? "-" : "X";
+			os << (g.at(r, c) ? "X" : "-");
 		}
 		os << std::endl;
 	}

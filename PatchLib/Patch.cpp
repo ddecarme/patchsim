@@ -75,23 +75,24 @@ std::unique_ptr<PatchBitmap> Patch::GetBitmap(int rot)
 }
 #endif
 
-int Patch::getCostButtons()
+int Patch::getCostButtons() const
 {
 	return m_cost_buttons;
 }
 
-int Patch::getCostTime()
+int Patch::getCostTime() const
 {
 	return m_cost_time;
 }
 
-int Patch::getDividend()
+int Patch::getDividend() const
 {
 	return m_dividend;
 }
 
 std::ostream& operator<<(std::ostream& os, Patch const& p)
 {
-	os << p.m_grid << std::endl;
+	os << p.m_grid ;
+	os << "Buttons: " << p.getCostButtons() << " Time: " << p.getCostTime() << " Dividend: " << p.getDividend() << endl;
 	return os;
 }
