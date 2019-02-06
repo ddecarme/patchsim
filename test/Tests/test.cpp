@@ -63,24 +63,26 @@ TEST(Grid, Intersect) {
 }
 
 TEST(Grid, Rotate) {
-	ASSERT_TRUE(false);
 	Grid g_orig(2, 3, { 1,1,1,0,1,0 });	
 	Grid g_expected(2, 3, { 1,1,1,0,1,0 });
+
+	std::unique_ptr<Grid> g_rot;
 	
-	g_orig.rotate(0);
-	EXPECT_TRUE(g_orig == g_expected);
+	g_rot = g_orig.getRotation(0);
+	EXPECT_TRUE(*g_rot == g_expected);
 
 	Grid g_expected1(3, 2, { 0,1,1,1,0,1 });
-	g_orig.rotate(1);
-	EXPECT_TRUE(g_orig == g_expected1);
+	g_rot = g_orig.getRotation(1);
+	EXPECT_TRUE(*g_rot == g_expected1);
 
-	Grid g_expected2(3, 2, { 1,0,1,1,1,0 });
-	g_orig.rotate(2);
-	EXPECT_TRUE(g_orig == g_expected2);
+	Grid g_expected2(2, 3, { 0,1,0,1,1,1 }); 
+	g_rot = g_orig.getRotation(2);
+	EXPECT_TRUE(*g_rot == g_expected2);
 
-	Grid g_expected3(2, 3, { 0,1,0,1,1,1 }); 
-	g_orig.rotate(3);
-	EXPECT_TRUE(g_orig == g_expected3);
+	Grid g_expected3(3, 2, { 1,0,1,1,1,0 });
+	g_rot = g_orig.getRotation(3);
+	EXPECT_TRUE(*g_rot == g_expected3);
+
 }
 
 TEST(Patch, Create) {
@@ -165,22 +167,22 @@ TEST(PatchList, Wraparound) {
 
 TEST(GameTrack, TurnOrder) {
 	GameTrack gt(2, 0);
-	EXPECT_EQ(gt.getNextPlayer(), 0);
+	EXPECT_EQ(gt.getActivePlayer(), 0);
 	EXPECT_EQ(gt.getPlayerPosition(0), 0);
 	EXPECT_EQ(gt.getPlayerPosition(1), 0);
 	
 	gt.advancePlayer(0, 1);
-	EXPECT_EQ(gt.getNextPlayer(), 1);
+	EXPECT_EQ(gt.getActivePlayer(), 1);
 	
 	// Advance p1 to be even, still p1's turn
 	gt.advancePlayer(1, 1);
-	EXPECT_EQ(gt.getNextPlayer(), 1);
+	EXPECT_EQ(gt.getActivePlayer(), 1);
 
 	gt.advancePlayer(1, 1);
-	EXPECT_EQ(gt.getNextPlayer(), 0);
+	EXPECT_EQ(gt.getActivePlayer(), 0);
 
 	gt.advancePlayer(0, 10);
-	EXPECT_EQ(gt.getNextPlayer(), 1);
+	EXPECT_EQ(gt.getActivePlayer(), 1);
 	EXPECT_EQ(gt.getPlayerPosition(0), 11);
 	EXPECT_EQ(gt.getPlayerPosition(1), 2);
 }
@@ -197,6 +199,15 @@ TEST(GameTrack, GameOver) {
 	EXPECT_FALSE(gt.isGameOver());
 	gt.advancePlayer(0, 1);
 	EXPECT_TRUE(gt.isGameOver());
+}
+
+TEST(GameTrack, NextPlayer) {
+	GameTrack gt(2, 0);
+
+	gt.advancePlayer(0, 5);
+	EXPECT_EQ(gt.getDistToNextPlayer(1), 5);
+	gt.advancePlayer(1, 10);
+	EXPECT_EQ(gt.getDistToNextPlayer(0), 5);
 }
 
 TEST(GameTrack, Milestones) {

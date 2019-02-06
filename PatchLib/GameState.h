@@ -26,4 +26,5 @@ struct Action
 	size_t patch_index;
 	size_t patch_row_offset;
 	size_t patch_col_offset;
+	int patch_rot;
 };

@@ -12,10 +12,13 @@ public:
 	// Construct a grid of given size, intialized to the input vector. Size of the vector
 	// must exactly match rows*cols
 	Grid(size_t rows, size_t cols, std::vector<bool> data);
+
+	// Copy constructor
+	Grid(const Grid & g);
 	~Grid();
 
-	// Rotate the grid data by the given number of ninty-degree turns
-	void rotate(int turns);
+	// Returns a new grid with the grid data rotated by the given number of ninty-degree turns
+	std::unique_ptr<Grid> getRotation(int turns);
 
 	// Merge a grid into this one by positioning the input grid at the given offset and 
 	// performing a union

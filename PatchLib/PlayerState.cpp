@@ -7,6 +7,7 @@
 PlayerState::PlayerState() :
 	m_grid(PLAYER_BOARD_DIM, PLAYER_BOARD_DIM),
 	m_buttons(5),
+	m_dividend(0),
 	m_has_bonus(false)
 {
 }
@@ -23,8 +24,28 @@ bool PlayerState::CheckPlacement(struct PatchPlacement& p)
 void PlayerState::AddPlacement(struct PatchPlacement& p)
 {
 	assert(m_grid.checkIntersect(p.patch_p->getGrid(), p.row_offset, p.col_offset) == false);
-	m_grid.merge(p.patch_p->getGrid(), p.row_offset, p.col_offset);
+	m_grid.merge(p.patch_p->getGrid(), p.row_offset, p.col_offset); // TODO rotations?
+
+	assert(m_buttons >= p.patch_p->getCostButtons());
 	m_buttons -= p.patch_p->getCostButtons();
+	m_dividend += p.patch_p->getDividend();
+}
+
+int PlayerState::getButtons() const
+{
+	return m_buttons;
+}
+
+int PlayerState::getDividend() const
+{
+	return m_dividend;
+}
+
+void PlayerState::addButtons(int num)
+{
+	// TODO Probably not good to expose this in the public interface that is sent outside the library
+	assert(m_buttons + num >= 0);
+	m_buttons += num;
 }
 
 std::ostream& operator<<(std::ostream& os, PlayerState const& ps) {

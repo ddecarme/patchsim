@@ -8,6 +8,7 @@ public:
 	HumanCLIPlayer();
 	~HumanCLIPlayer();
 
-	void TakeTurn(const GameState& state, Action& out_action) ;
+	void TakeTurn(const GameState& state, Action& out_action);
+	void PlaceSparePatch(const GameState &state, Action& out_action);
 };
 

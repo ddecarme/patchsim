@@ -29,6 +29,20 @@ void GameModel::log(const std::string&& str)
 	cout << str << endl;
 }
 
+void GameModel::advancePlayer(PlayerID player, int spaces)
+{
+	if (m_state.m_track.spareInRange(player, spaces)) {
+		assert(0);
+	}
+	else if (m_state.m_track.buttonInRange(player, spaces)) {
+		// Add the player's dividend to their number of buttons
+		int dividend = m_state.m_player_states[player].getDividend();
+		m_state.m_player_states[player].addButtons(dividend);		
+	}
+
+	m_state.m_track.advancePlayer(player, spaces);
+}
+
 void GameModel::startGame()
 {
 	using namespace std;
@@ -48,23 +62,45 @@ void GameModel::startGame()
 		cout << m_state.m_track;
 
 		// Determine which players' turn it is
-		int cur_player = m_state.m_track.getNextPlayer();
+		PlayerID cur_player = m_state.m_track.getActivePlayer();
 
 		// Tell the player to take its turn and give us a resulting action
 		Action player_action;
 		m_players[cur_player]->TakeTurn(m_state, player_action);
 
 		// Implement the player's action
-		switch (player_action.m_choice) {
-		case Action::PASS:
+		if (player_action.m_choice == Action::PASS) {
 			cout << "Player PASSED" << endl;
-			assert(0);
-			break;
-
-		case Action::TAKE_PATCH:
-			cout << "Player took patch " << player_action.patch_index;
-			break;
+			int steps = m_state.m_track.getDistToNextPlayer(cur_player) + 1;
+			advancePlayer(cur_player, steps);
+			m_state.m_player_states[cur_player].addButtons(steps);
 		}
+		else if (player_action.m_choice == Action::TAKE_PATCH) {
+			cout << "Player took patch " << player_action.patch_index;
+
+			// Pull the selected patch off the list, and advance the head pointer
+			shared_ptr<Patch> p_patch = m_state.m_patchlist.getPatch(player_action.patch_index);
+			m_state.m_patchlist.removePatch(player_action.patch_index);
+#if 0
+			// Add the patch to the player's grid, and subtract the cost
+			m_state.m_player_states[cur_player].AddPlacement(player_action.m_placement);
+
+
+			// Subtract the cost from the player's button count
+			int cost = p_patch->getCostButtons();
+			assert(m_state.m_player_states[cur_player].getButtons() >= cost);
+			m_state.m_player_states[cur_player].addButtons(cost);
+#endif
+
+			// Advance on the game track
+			advancePlayer(cur_player, p_patch->getCostTime());
+			// TODO Add patch to player board
+		}
+		else {
+			assert(0);
+		}
+
+
 	}
 
 	// TODO Calculate scores and declare winner

@@ -20,4 +20,5 @@ private:
 	std::vector<std::unique_ptr<Player>> m_players;
 
 	static void log(const std::string &&str);
+	void advancePlayer(PlayerID player, int spaces);
 };

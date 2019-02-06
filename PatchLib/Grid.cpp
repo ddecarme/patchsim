@@ -17,33 +17,64 @@ Grid::Grid(size_t rows, size_t cols, std::vector<bool> data) :
 {
 }
 
+Grid::Grid(const Grid & g) :
+	m_data(g.m_data),
+	m_rows(g.m_rows),
+	m_cols(g.m_cols)
+{
+}
+
 Grid::~Grid()
 {
 }
 
-void Grid::rotate(int turns)
+std::unique_ptr<Grid> Grid::getRotation(int turns)
 {
-	assert(false);
-
 	// Alias rotations greater than 3
 	turns = turns % 4;
 
 	// No rotation, no change
 	if (turns == 0) {
-		return;
+		return std::make_unique<Grid>(*this);
 	}
-#if 0
+
+	size_t new_rows = m_rows, new_cols = m_cols;
+
+	// Reverse rows/cols size for odd rotations
+	if (turns != 2) {
+		new_rows = m_cols;
+		new_cols = m_rows;
+	}
+
+	std::unique_ptr<Grid> g = std::make_unique<Grid>(new_rows, new_cols);
+
 	if (turns == 1)
 	{
-		for (size_t c = 0; c < m_bitmap[0].size(); i++)
+		for (size_t i = 0; i < new_rows; i++)
 		{
-			for (size_t r = 0; r < m_bitmap.size(); j++)
+			for (size_t j = 0; j < new_cols; j++)
 			{
-				(*bitm_p)[i][j] = m_bitmap[i][j];
+				g->set(i, j, at(m_rows - j - 1, i));
 			}
 		}
 	}
-#endif
+	else if (turns == 2)
+	{
+		g->setData(m_data);
+		std::reverse(g->m_data.begin(), g->m_data.end());
+	}
+	else if (turns == 3)
+	{
+		for (size_t i = 0; i < new_rows; i++)
+		{
+			for (size_t j = 0; j < new_cols; j++)
+			{
+				g->set(i, j, at(j, m_cols - i - 1));
+			}
+		}
+	}
+
+	return g;
 }
 
 // Iterate over the input grid and add any true elements to the member grid.

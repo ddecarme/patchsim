@@ -8,7 +8,7 @@ static const std::vector<int> BUTTON_LOCS = { 4,10,16,22,28,34,40,46,52 };
 static const std::vector<int> SPARE_LOCS = { 19,25,31,43,49 };
 static const int NUM_SPACES = 53;
 
-GameTrack::GameTrack(int num_players, int first_player) :
+GameTrack::GameTrack(size_t num_players, PlayerID first_player) :
 	m_player_loc(num_players, 0),
 	m_cur_player(first_player)
 {
@@ -19,17 +19,50 @@ GameTrack::~GameTrack()
 {
 }
 
-int GameTrack::getPlayerPosition(int player_idx) const
+int GameTrack::getPlayerPosition(PlayerID player_idx) const
 {
 	return m_player_loc[player_idx];
 }
 
-int GameTrack::getNextPlayer() const
+PlayerID GameTrack::getActivePlayer() const
 {
 	return m_cur_player;
 }
 
-void GameTrack::advancePlayer(int adv_player, int steps)
+PlayerID GameTrack::getOtherPlayer(PlayerID player) const
+{
+	// Only works for 2 players
+	assert(m_player_loc.size() == 2);
+	return player ^ 1;
+}
+
+int GameTrack::getDistToNextPlayer(PlayerID player_idx) const
+{
+	PlayerID other_player = getOtherPlayer(player_idx);
+	return m_player_loc[other_player] - m_player_loc[player_idx];
+}
+
+// Get the first player on the board in the interval [start_loc, end_loc) scanning towards the end
+// Returns true if a player is found, false otherwise
+bool GameTrack::findNextPlayer(int start_loc, int end_loc, PlayerID *out_player) const
+{
+	// TODO Only one user, is this the best interface?
+	int min_player_loc = end_loc;
+	bool found = false;
+	for (PlayerID i = 0; i < m_player_loc.size(); i++) {
+
+		// Find min location
+		int loc = m_player_loc[i];
+		if (loc >= start_loc && loc < end_loc && loc < min_player_loc) {
+			*out_player = i;
+			min_player_loc = m_player_loc[i];
+			found = true;
+		}
+	}
+	return found;
+}
+
+void GameTrack::advancePlayer(PlayerID adv_player, int steps)
 {
 	// We should only ever advance who the tracker thinks is the current player,
 	// otherwise there's a logic bug somewhere
@@ -41,6 +74,10 @@ void GameTrack::advancePlayer(int adv_player, int steps)
 	// Cap the location at the end of the board
 	m_player_loc[adv_player] = std::min(new_loc, NUM_SPACES);
 
+	(void)findNextPlayer(0, m_player_loc[adv_player], &m_cur_player);
+
+	// TODO Cleanup
+#if 0
 	// Check if the current player has changed by iterating through
 	// the other players and checking if their position is now lower
 	int min_player_loc = m_player_loc[adv_player];
@@ -56,7 +93,7 @@ void GameTrack::advancePlayer(int adv_player, int steps)
 			min_player_loc = m_player_loc[i];
 		}
 	}
-
+#endif
 }
 
 bool GameTrack::isGameOver() const
@@ -91,17 +128,17 @@ bool GameTrack::checkSpace(int space_idx, std::vector<int> const &indexes) const
 	return iter != indexes.cend();
 }
 
-bool GameTrack::buttonInRange(int player_idx, int steps) const
+bool GameTrack::buttonInRange(PlayerID player_idx, int steps) const
 {
 	return checkRange(player_idx, player_idx + steps, BUTTON_LOCS.cbegin(), BUTTON_LOCS.cend());
 }
 
-bool GameTrack::spareInRange(int player_idx, int steps) const
+bool GameTrack::spareInRange(PlayerID player_idx, int steps) const
 {
 	return checkRange(player_idx, player_idx + steps, SPARE_LOCS.cbegin(), SPARE_LOCS.cend());
 }
 
-void GameTrack::formatPlayerLine(int player_idx, std::string &str) const
+void GameTrack::formatPlayerLine(PlayerID player_idx, std::string &str) const
 {
 	str.insert(str.end(), m_player_loc[player_idx], ' ');
 	str.push_back('0' + player_idx + 1);	
@@ -138,7 +175,7 @@ std::ostream& operator<<(std::ostream& os, GameTrack const& gt)
 	os << line << std::endl;
 
 	// Print whose turn it is
-	os << "Player " << gt.getNextPlayer() + 1 << "'s turn" << std::endl;
+	os << "Player " << gt.getActivePlayer() + 1 << "'s turn" << std::endl;
 
 	return os;
 }

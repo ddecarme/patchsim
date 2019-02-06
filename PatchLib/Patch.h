@@ -17,6 +17,7 @@ public:
 	int getCostButtons() const;
 	int getCostTime() const;
 	int getDividend() const;
+
 	
 private:
 	Grid m_grid;
@@ -28,7 +29,7 @@ private:
 
 struct PatchPlacement
 {
-	std::shared_ptr<Patch> patch_p;
+	Patch *patch_p;
 	int row_offset;
 	int col_offset;
 	int rot;	
